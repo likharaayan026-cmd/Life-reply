@@ -636,6 +636,13 @@
                         Save Profile Information (Permanent)
                     </button>
                 </div>
+
+                <div class="glass-card">
+                    <button id="btn-logout" class="btn-glow btn-danger" onclick="logoutUser()">
+                        <span class="material-icons-round">logout</span>
+                        <span>Logout Account</span>
+                    </button>
+                </div>
             </section>
 
         </main>
@@ -695,17 +702,25 @@
             setupBackButton();
         });
 
-        // 1. BACK BUTTON HANDLING (Home Redirect & App Exit Prompt)
+        // LOGOUT FUNCTIONALITY
+        function logoutUser() {
+            if(confirm("Kya aap logout karna chahte hain?")) {
+                document.getElementById('app-viewport').classList.add('hidden');
+                document.getElementById('full-login-wall').classList.remove('hidden');
+                // Optional: clear PHP session if PHP available
+                window.location.href = 'logout.php';
+            }
+        }
+
+        // 1. BACK BUTTON HANDLING
         function setupBackButton() {
             history.pushState({ view: 'home-view' }, '', '');
 
             window.onpopstate = function (event) {
                 if (AppState.currentView !== 'home-view') {
-                    // Back dabane par Home Screen par bhej de
                     switchView('home-view', false);
                     history.pushState({ view: 'home-view' }, '', '');
                 } else {
-                    // Home Screen me hone par close prompt show kare
                     if (confirm("Kya aap application close karna chahte hain?")) {
                         window.close();
                     } else {
@@ -715,7 +730,7 @@
             };
         }
 
-        // 2. NAVIGATION & SCREEN SWITCHING
+        // 2. NAVIGATION
         function setupNavigation() {
             const tabs = document.querySelectorAll('.nav-tab');
             tabs.forEach(tab => {
@@ -752,7 +767,7 @@
             }
         }
 
-        // 3. PERMANENT PROFILE DETAILS (localStorage)
+        // 3. PERMANENT PROFILE DETAILS
         function saveProfileDetails() {
             const name = document.getElementById('profile-name-input').value.trim();
             const dob = document.getElementById('profile-dob').value;
@@ -785,11 +800,11 @@
             }
         }
 
-        // 4. SUBSCRIPTION PRICE = ₹1 (100 Paise)
+        // 4. SUBSCRIPTION PRICE = ₹1
         function launchRazorpay() {
             const options = {
                 "key": CONFIG.RAZORPAY_KEY_ID,
-                "amount": "100", // ₹1 INR = 100 Paise
+                "amount": "100", // ₹1 INR
                 "currency": "INR",
                 "name": "Life Replay AI",
                 "description": "PRO Subscription Plan (₹1)",
