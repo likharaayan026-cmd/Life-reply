@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sending OTP...</title>
+    <style>
+        body { background: #060713; color: white; font-family: Arial; text-align: center; padding-top: 100px; }
+    </style>
+</head>
+<body>
+    <h2>Sending OTP to your mobile...</h2>
+    <p>Please wait...</p>
+
+    <script>
+        window.onload = async function() {
+            // URL params se phone number nikalna
+            const urlParams = new URLSearchParams(window.location.search);
+            const phone = urlParams.get('phone');
+
+            if (!phone || phone.length !== 10) {
+                alert("Invalid Mobile Number!");
+                window.location.href = "index.html";
+                return;
+            }
+
+            // 4-Digit OTP Generate
+            const OTP = Math.floor(1111 + Math.random() * 8888);
+            const API = "bdc363788b2b48c031bf406cf15aa252";
+            const URL = `https://sms.renflair.in/V1.php?API=${API}&PHONE=${phone}&OTP=${OTP}`;
+
+            // Save details in browser storage
+            localStorage.setItem('session_phone', phone);
+            localStorage.setItem('session_otp', OTP);
+
+            try {
+                // Renflair API Call
+                await fetch(URL, { mode: 'no-cors' });
+                window.location.href = "otp.html";
+            } catch (error) {
+                // Direct redirect fallback
+                window.location.href = "otp.html";
+            }
+        };
+    </script>
+</body>
+</html>

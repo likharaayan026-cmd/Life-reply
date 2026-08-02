@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>Verifying OTP...</title>
+    <style>
+        body { background: #060713; color: white; font-family: Arial; text-align: center; padding-top: 100px; }
+    </style>
+</head>
+<body>
+    <h2>Verifying OTP...</h2>
+
+    <script>
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const enteredOtp = urlParams.get('otp');
+            const actualOtp = localStorage.getItem('session_otp');
+
+            if (enteredOtp && enteredOtp.toString() === actualOtp.toString()) {
+                // Sahi OTP
+                localStorage.setItem('is_logged_in', 'true');
+                localStorage.removeItem('session_otp'); // Clean OTP
+                alert("Account Verified Successfully!");
+                window.location.href = "index.html"; // Home view par redirect
+            } else {
+                // Galat OTP
+                window.location.href = "otp.html?msg=Incorrect OTP Entered";
+            }
+        };
+    </script>
+</body>
+</html>
