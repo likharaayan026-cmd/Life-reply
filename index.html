@@ -1,9 +1,3 @@
-<?php
-session_start();
-// Agar user logged in hai toh check karein
-$isLoggedIn = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true;
-$phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
-?>
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -132,7 +126,7 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
             100% { transform: translateX(200%); }
         }
 
-        /* Full Screen Login Screen */
+        /* Login Screen */
         .full-login-screen {
             position: fixed;
             inset: 0;
@@ -460,8 +454,7 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
         </div>
     </div>
 
-    <?php if (!$isLoggedIn): ?>
-    <section id="full-login-wall" class="full-login-screen">
+    <section id="full-login-wall" class="full-login-screen hidden">
         <div class="login-card">
             <div class="glow-ring" style="width: 70px; height: 70px; margin: 0 auto 16px;">
                 <span class="material-icons-round" style="font-size: 36px; color:#FFF;">lock</span>
@@ -482,8 +475,6 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
         </div>
     </section>
 
-    <?php else: ?>
-
     <div id="app-viewport" class="app-viewport">
 
         <main class="content-scroll">
@@ -496,7 +487,7 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
                         </div>
                         <div>
                             <span class="greeting-sub">Replaying Life</span>
-                            <h3 id="display-username">+91 <?php echo htmlspecialchars($phone); ?></h3>
+                            <h3 id="display-username">Welcome User</h3>
                         </div>
                     </div>
                     <button id="btn-pro-upgrade" class="pro-chip">
@@ -615,7 +606,7 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
             <section id="profile-view" class="view-section hidden">
                 <div class="glass-card" style="text-align:center;">
                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Aayan" alt="Profile" style="width:70px; height:70px; border-radius:50%; margin-bottom:10px;">
-                    <h3 id="profile-display-name">+91 <?php echo htmlspecialchars($phone); ?></h3>
+                    <h3 id="profile-display-name">User Profile</h3>
                     <span id="account-status-badge" style="display:inline-block; font-size:11px; padding:4px 12px; border-radius:20px; background:rgba(255,255,255,0.1); margin-top:6px; color:var(--accent-glow);">Free Account</span>
                 </div>
 
@@ -643,13 +634,6 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
 
                     <button id="btn-save-profile" onclick="saveProfileDetails()" class="btn-glow btn-sm" style="width:100%; margin-top:8px;">
                         Save Profile Information (Permanent)
-                    </button>
-                </div>
-
-                <div class="glass-card">
-                    <button id="btn-logout" class="btn-glow btn-danger" onclick="window.location.href='logout.php';">
-                        <span class="material-icons-round">logout</span>
-                        <span>Logout Account</span>
                     </button>
                 </div>
             </section>
@@ -681,7 +665,6 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
         </nav>
 
     </div>
-    <?php endif; ?>
 
     <script>
         const CONFIG = {
@@ -712,20 +695,17 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
             setupBackButton();
         });
 
-        // -----------------------------------------------------------------
-        // 1. BACK BUTTON HANDLING (Home Redirect & Exit Logic)
-        // -----------------------------------------------------------------
+        // 1. BACK BUTTON HANDLING (Home Redirect & App Exit Prompt)
         function setupBackButton() {
-            // Initial History state
             history.pushState({ view: 'home-view' }, '', '');
 
             window.onpopstate = function (event) {
                 if (AppState.currentView !== 'home-view') {
-                    // Agar kisi aur section m hai toh Home Screen par bhej do
+                    // Back dabane par Home Screen par bhej de
                     switchView('home-view', false);
                     history.pushState({ view: 'home-view' }, '', '');
                 } else {
-                    // Agar pehle se home screen pe hai toh app close karne ka alert / exit karein
+                    // Home Screen me hone par close prompt show kare
                     if (confirm("Kya aap application close karna chahte hain?")) {
                         window.close();
                     } else {
@@ -735,9 +715,7 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
             };
         }
 
-        // -----------------------------------------------------------------
         // 2. NAVIGATION & SCREEN SWITCHING
-        // -----------------------------------------------------------------
         function setupNavigation() {
             const tabs = document.querySelectorAll('.nav-tab');
             tabs.forEach(tab => {
@@ -757,7 +735,6 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
         function switchView(viewId, pushHistory = true) {
             AppState.currentView = viewId;
 
-            // Nav Tabs Highlight Update
             document.querySelectorAll('.nav-tab').forEach(t => {
                 if (t.getAttribute('data-target') === viewId) {
                     t.classList.add('active');
@@ -766,7 +743,6 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
                 }
             });
 
-            // View Visibility Update
             document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
             const target = document.getElementById(viewId);
             if (target) target.classList.remove('hidden');
@@ -776,9 +752,7 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
             }
         }
 
-        // -----------------------------------------------------------------
-        // 3. PERMANENT PROFILE / DEVELOPER DETAILS SAVE (localStorage)
-        // -----------------------------------------------------------------
+        // 3. PERMANENT PROFILE DETAILS (localStorage)
         function saveProfileDetails() {
             const name = document.getElementById('profile-name-input').value.trim();
             const dob = document.getElementById('profile-dob').value;
@@ -789,11 +763,11 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
             localStorage.setItem('user_profile_data', JSON.stringify(profileObj));
 
             if (name) {
-                const dispName = document.getElementById('profile-display-name');
-                if (dispName) dispName.innerText = name;
+                document.getElementById('profile-display-name').innerText = name;
+                document.getElementById('display-username').innerText = name;
             }
 
-            alert("✅ Developer / Profile details permanently save ho gayi hain!");
+            alert("✅ Profile / Developer details permanently save ho gayi hain!");
         }
 
         function loadProfileDetails() {
@@ -802,8 +776,8 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
                 const p = JSON.parse(savedData);
                 if (p.name) {
                     document.getElementById('profile-name-input').value = p.name;
-                    const dispName = document.getElementById('profile-display-name');
-                    if (dispName) dispName.innerText = p.name;
+                    document.getElementById('profile-display-name').innerText = p.name;
+                    document.getElementById('display-username').innerText = p.name;
                 }
                 if (p.dob) document.getElementById('profile-dob').value = p.dob;
                 if (p.gender) document.getElementById('profile-gender').value = p.gender;
@@ -811,13 +785,11 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
             }
         }
 
-        // -----------------------------------------------------------------
-        // 4. SUBSCRIPTION PRICE = 1 RS (Razorpay Integration)
-        // -----------------------------------------------------------------
+        // 4. SUBSCRIPTION PRICE = ₹1 (100 Paise)
         function launchRazorpay() {
             const options = {
                 "key": CONFIG.RAZORPAY_KEY_ID,
-                "amount": "100", // 100 Paise = ₹1 INR
+                "amount": "100", // ₹1 INR = 100 Paise
                 "currency": "INR",
                 "name": "Life Replay AI",
                 "description": "PRO Subscription Plan (₹1)",
@@ -831,9 +803,7 @@ $phone = isset($_SESSION['phone']) ? $_SESSION['phone'] : '';
             new Razorpay(options).open();
         }
 
-        // -----------------------------------------------------------------
-        // 5. OTHER APP LOGIC (Media, Memory, AI)
-        // -----------------------------------------------------------------
+        // 5. OTHER APP FUNCTIONS
         function setupEventListeners() {
             const mediaTrigger = document.getElementById('media-trigger');
             if(mediaTrigger) {
